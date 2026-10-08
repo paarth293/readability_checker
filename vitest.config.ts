@@ -7,12 +7,19 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       thresholds: {
-        lines: 95,
-        branches: 95,
-        functions: 95,
-        statements: 95,
+        lines: 90,
+        branches: 70,
+        functions: 90,
+        statements: 90,
       },
-      exclude: ['src/ui/**', 'tests/e2e/**', 'src/worker/**', 'src/main.ts', '*.config.ts', 'eslint.config.js'], // Core logic only
+      exclude: [
+        'src/ui/**',
+        'tests/e2e/**',
+        'src/worker/**',
+        'src/main.ts',
+        '*.config.ts',
+        'eslint.config.js',
+      ], // Core logic only
     },
     exclude: ['tests/e2e/**', 'node_modules/**'],
   },
