@@ -21,9 +21,11 @@ test('formulas - computations', () => {
 });
 
 test('interpretation - correct bands', () => {
-  const result = interpretFleschReadingEase(95);
-  expect(result.label).toBe('Very Easy');
-
-  const result2 = interpretFleschReadingEase(65);
-  expect(result2.label).toBe('Standard');
+  expect(interpretFleschReadingEase(95).label).toBe('Very Easy');
+  expect(interpretFleschReadingEase(85).label).toBe('Easy');
+  expect(interpretFleschReadingEase(75).label).toBe('Fairly Easy');
+  expect(interpretFleschReadingEase(65).label).toBe('Standard');
+  expect(interpretFleschReadingEase(55).label).toBe('Fairly Difficult');
+  expect(interpretFleschReadingEase(35).label).toBe('Difficult');
+  expect(interpretFleschReadingEase(15).label).toBe('Very Difficult');
 });
