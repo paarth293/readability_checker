@@ -1,27 +1,30 @@
 # Architecture Map
 
 ## Module Dependency Map
+
 The application is structured in three strictly decoupled layers, with one-directional dependencies:
 
 1. **Analysis Core (`src/core/`)**
    - Pure, framework-independent TypeScript modules.
    - Responsible for text normalization, tokenization, syllable counting, readability formulas, and sentence scoring.
-   - *Dependencies:* None. No DOM access.
+   - _Dependencies:_ None. No DOM access.
 
 2. **Worker Wrapper (`src/worker/`)**
    - Wraps the Analysis Core in a Web Worker to run off the main thread.
    - Handles message parsing, request identification, and result formatting.
-   - *Dependencies:* Analysis Core.
+   - _Dependencies:_ Analysis Core.
 
 3. **UI Layer (`src/ui/`)**
    - Plain TypeScript Web Components and raw DOM manipulation.
    - Handles text input, state management, UI rendering, and user interactions.
-   - *Dependencies:* Worker Wrapper (communicates via message passing).
+   - _Dependencies:_ Worker Wrapper (communicates via message passing).
 
 ## Data Contract: Worker & UI
+
 Communication between the UI layer and the Web Worker happens via `postMessage`.
 
 **Request (UI -> Worker):**
+
 ```typescript
 {
   type: 'ANALYZE_REQUEST';
@@ -31,6 +34,7 @@ Communication between the UI layer and the Web Worker happens via `postMessage`.
 ```
 
 **Response (Worker -> UI):**
+
 ```typescript
 {
   type: 'ANALYZE_SUCCESS';
@@ -45,10 +49,14 @@ Communication between the UI layer and the Web Worker happens via `postMessage`.
 ```
 
 **Error Response (Worker -> UI):**
+
 ```typescript
 {
   type: 'ANALYZE_ERROR';
   id: number;
-  error: { code: 'TOO_SHORT' | 'TOO_LONG' | 'INTERNAL_ERROR'; message: string; };
+  error: {
+    code: 'TOO_SHORT' | 'TOO_LONG' | 'INTERNAL_ERROR';
+    message: string;
+  }
 }
 ```

@@ -14,12 +14,10 @@ export function scoreSentences(sentences: Sentence[]): HardSentence[] {
   const scored = sentences.map((sentence) => {
     const wordCount = sentence.words.length;
     let complexWordCount = 0;
-    let syllableCount = 0;
     let clauses = 0;
 
     for (const word of sentence.words) {
       const syllables = countSyllables(word.text);
-      syllableCount += syllables;
       if (syllables >= 3 && isComplexWord(word.text)) {
         complexWordCount++;
       }
@@ -32,8 +30,8 @@ export function scoreSentences(sentences: Sentence[]): HardSentence[] {
     }
 
     // Difficulty score based on words, complex words, clauses
-    const difficultyScore = (wordCount * 0.5) + (complexWordCount * 2) + (clauses * 1.5);
-    
+    const difficultyScore = wordCount * 0.5 + complexWordCount * 2 + clauses * 1.5;
+
     const reasons = [];
     if (wordCount > 25) {
       reasons.push({ label: 'Very long sentence', value: `${wordCount} words` });
@@ -44,7 +42,7 @@ export function scoreSentences(sentences: Sentence[]): HardSentence[] {
     if (clauses > 4) {
       reasons.push({ label: 'Heavy punctuation / many clauses', value: `${clauses} markers` });
     }
-    
+
     // Fallback reason if it's generally hard but didn't hit specific thresholds
     if (reasons.length === 0 && difficultyScore > 20) {
       reasons.push({ label: 'High structural complexity', value: difficultyScore.toFixed(1) });
@@ -62,7 +60,7 @@ export function scoreSentences(sentences: Sentence[]): HardSentence[] {
 
   // Filter out sentences that aren't actually hard (threshold)
   const threshold = 15;
-  const hardSentences = scored.filter(s => s.difficultyScore >= threshold);
+  const hardSentences = scored.filter((s) => s.difficultyScore >= threshold);
 
   // Sort by difficulty descending, tie break by startOffset
   hardSentences.sort((a, b) => {
@@ -74,7 +72,7 @@ export function scoreSentences(sentences: Sentence[]): HardSentence[] {
 
   // Take top 5
   const top5 = hardSentences.slice(0, 5);
-  
+
   // Assign ranks
   top5.forEach((s, i) => {
     s.rank = i + 1;

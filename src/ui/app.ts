@@ -45,31 +45,37 @@ export function setupApp(element: HTMLElement) {
       renderInput();
     });
 
-    analyzeBtn.addEventListener('click', async () => {
-      if (!text.trim()) {
-        errorMsg.textContent = 'Please paste some text first.';
-        return;
-      }
-      
-      // Simple word count check for max
-      if (text.split(/\s+/).length > MAX_WORDS) {
-        errorMsg.textContent = \`Input exceeds maximum allowed words (\${MAX_WORDS}).\`;
-        return;
-      }
+    analyzeBtn.addEventListener('click', () => {
+      void (async () => {
+        if (!text.trim()) {
+          errorMsg.textContent = 'Please paste some text first.';
+          return;
+        }
 
-      isAnalyzing = true;
-      analyzeBtn.textContent = 'Analyzing...';
-      analyzeBtn.disabled = true;
-      errorMsg.textContent = '';
+        // Simple word count check for max
+        if (text.split(/\s+/).length > MAX_WORDS) {
+          errorMsg.textContent = `Input exceeds maximum allowed words (${MAX_WORDS}).`;
+          return;
+        }
 
-      try {
-        const result = await client.analyze(text);
-        renderResults(result);
-      } catch (err: any) {
-        errorMsg.textContent = 'An error occurred during analysis: ' + err.message;
-      } finally {
-        isAnalyzing = false;
-      }
+        isAnalyzing = true;
+        analyzeBtn.textContent = 'Analyzing...';
+        analyzeBtn.disabled = true;
+        errorMsg.textContent = '';
+
+        try {
+          const result = await client.analyze(text);
+          renderResults(result);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            errorMsg.textContent = 'An error occurred during analysis: ' + err.message;
+          } else {
+            errorMsg.textContent = 'An error occurred during analysis.';
+          }
+        } finally {
+          isAnalyzing = false;
+        }
+      })();
     });
   };
 
@@ -77,33 +83,33 @@ export function setupApp(element: HTMLElement) {
     // Generate annotated text
     let annotatedHTML = '';
     let lastIndex = 0;
-    
+
     // Sort highlights by startOffset to inject markup safely
     const highlights = [...result.hardestSentences].sort((a, b) => a.startOffset - b.startOffset);
-    
+
     // Sanitize function to escape HTML
     const escapeHtml = (unsafe: string) => {
       return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     };
 
     for (const sentence of highlights) {
       const beforeText = text.substring(lastIndex, sentence.startOffset);
       annotatedHTML += escapeHtml(beforeText);
-      
+
       const sentenceText = text.substring(sentence.startOffset, sentence.endOffset);
-      annotatedHTML += `<mark class="highlight highlight-\${sentence.rank}" id="sentence-\${sentence.rank}">
-        <span class="sr-only">Rank \${sentence.rank} hardest sentence: </span>\${escapeHtml(sentenceText)}
+      annotatedHTML += `<mark class="highlight highlight-${sentence.rank}" id="sentence-${sentence.rank}">
+        <span class="sr-only">Rank ${sentence.rank} hardest sentence: </span>${escapeHtml(sentenceText)}
       </mark>`;
-      
+
       lastIndex = sentence.endOffset;
     }
     annotatedHTML += escapeHtml(text.substring(lastIndex));
-    
+
     // Preserve line breaks
     annotatedHTML = annotatedHTML.replace(/\\n/g, '<br/>');
 
@@ -119,43 +125,47 @@ export function setupApp(element: HTMLElement) {
         <div style="display: grid; grid-template-columns: 1fr; gap: var(--spacing-6); @media(min-width: 768px) { grid-template-columns: 2fr 1fr; }">
           
           <div class="annotated-text text-reading" style="background: var(--color-surface); padding: var(--spacing-4); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); max-height: 70vh; overflow-y: auto;">
-            \${annotatedHTML}
+            ${annotatedHTML}
           </div>
 
           <aside class="sidebar">
             <div class="score-card" style="background: var(--color-surface); padding: var(--spacing-4); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--spacing-4); text-align: center;">
-              <div style="font-size: 3rem; font-weight: bold; color: var(--color-primary);">\${result.headlineScore.score}</div>
-              <div style="font-size: 1.25rem; font-weight: bold;">\${result.headlineScore.label}</div>
-              <p style="color: var(--color-text-muted);">\${result.headlineScore.interpretation}</p>
+              <div style="font-size: 3rem; font-weight: bold; color: var(--color-primary);">${result.headlineScore.score}</div>
+              <div style="font-size: 1.25rem; font-weight: bold;">${result.headlineScore.label}</div>
+              <p style="color: var(--color-text-muted);">${result.headlineScore.interpretation}</p>
             </div>
 
             <div class="metrics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2); margin-bottom: var(--spacing-4);">
               <div style="background: var(--color-surface); padding: var(--spacing-2); border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-border);">
-                <div style="font-size: 1.25rem; font-weight: bold;">\${result.metrics.wordCount}</div>
+                <div style="font-size: 1.25rem; font-weight: bold;">${result.metrics.wordCount}</div>
                 <div style="font-size: 0.75rem; color: var(--color-text-muted);">Words</div>
               </div>
               <div style="background: var(--color-surface); padding: var(--spacing-2); border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-border);">
-                <div style="font-size: 1.25rem; font-weight: bold;">\${result.metrics.readingTimeMinutes} min</div>
+                <div style="font-size: 1.25rem; font-weight: bold;">${result.metrics.readingTimeMinutes} min</div>
                 <div style="font-size: 0.75rem; color: var(--color-text-muted);">Reading Time</div>
               </div>
             </div>
 
             <div class="hard-sentences" style="background: var(--color-surface); padding: var(--spacing-4); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
-              <h3 style="margin-top: 0;">Top \${result.hardestSentences.length} Hardest Sentences</h3>
-              \${result.hardestSentences.length === 0 ? '<p>No significantly hard sentences found.</p>' : ''}
+              <h3 style="margin-top: 0;">Top ${result.hardestSentences.length} Hardest Sentences</h3>
+              ${result.hardestSentences.length === 0 ? '<p>No significantly hard sentences found.</p>' : ''}
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-3);">
-                \${result.hardestSentences.map(s => `
+                ${result.hardestSentences
+                  .map(
+                    (s) => `
                   <li style="border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--spacing-2);">
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                      <span style="font-weight: bold; color: var(--color-primary);">#\${s.rank}</span>
-                      <button data-jump="\${s.rank}" style="background: none; border: none; color: var(--color-primary); cursor: pointer; text-decoration: underline; font-size: 0.875rem;">Jump</button>
+                      <span style="font-weight: bold; color: var(--color-primary);">#${s.rank}</span>
+                      <button data-jump="${s.rank}" style="background: none; border: none; color: var(--color-primary); cursor: pointer; text-decoration: underline; font-size: 0.875rem;">Jump</button>
                     </div>
-                    <p style="font-size: 0.875rem; margin: var(--spacing-2) 0;">\${escapeHtml(s.text)}</p>
+                    <p style="font-size: 0.875rem; margin: var(--spacing-2) 0;">${escapeHtml(s.text)}</p>
                     <div style="font-size: 0.75rem; color: var(--color-text-muted);">
-                      \${s.reasons.map(r => `&bull; \${r.label} (\${r.value})`).join('<br/>')}
+                      ${s.reasons.map((r) => `&bull; ${r.label} (${r.value})`).join('<br/>')}
                     </div>
                   </li>
-                `).join('')}
+                `,
+                  )
+                  .join('')}
               </ul>
             </div>
           </aside>
@@ -167,14 +177,16 @@ export function setupApp(element: HTMLElement) {
       renderInput();
     });
 
-    document.querySelectorAll('[data-jump]').forEach(btn => {
+    document.querySelectorAll('[data-jump]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const rank = (e.target as HTMLElement).getAttribute('data-jump');
-        const mark = document.getElementById(`sentence-\${rank}`);
+        const mark = document.getElementById(`sentence-${rank}`);
         if (mark) {
           mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
           mark.style.outline = '2px solid var(--color-primary)';
-          setTimeout(() => { mark.style.outline = 'none'; }, 2000);
+          setTimeout(() => {
+            mark.style.outline = 'none';
+          }, 2000);
         }
       });
     });

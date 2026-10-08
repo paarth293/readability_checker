@@ -17,15 +17,15 @@ export function computeStats(sentences: Sentence[]): TextStats {
   let syllableCount = 0;
   let characterCount = 0;
   let complexWordCount = 0;
-  
+
   for (const sentence of sentences) {
     for (const word of sentence.words) {
       wordCount++;
       characterCount += word.text.length;
-      
+
       const syllables = countSyllables(word.text);
       syllableCount += syllables;
-      
+
       if (syllables >= 3 && isComplexWord(word.text)) {
         complexWordCount++;
       }
@@ -34,7 +34,7 @@ export function computeStats(sentences: Sentence[]): TextStats {
 
   const sentenceCount = sentences.length || 1;
   const safeWordCount = wordCount || 1;
-  
+
   return {
     wordCount,
     sentenceCount: sentences.length,

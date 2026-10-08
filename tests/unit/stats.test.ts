@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { countSyllables, isComplexWord } from '../../src/core/syllables';
+import { countSyllables } from '../../src/core/syllables';
 import { computeStats } from '../../src/core/stats';
 
 test('syllables - count accurately', () => {
@@ -12,13 +12,18 @@ test('syllables - count accurately', () => {
 
 test('stats - computes overall stats correctly', () => {
   const sentences = [
-    { text: 'A quick test.', startOffset: 0, endOffset: 13, words: [
-      { text: 'A', startOffset: 0, endOffset: 1 },
-      { text: 'quick', startOffset: 2, endOffset: 7 },
-      { text: 'test', startOffset: 8, endOffset: 12 }
-    ] }
+    {
+      text: 'A quick test.',
+      startOffset: 0,
+      endOffset: 13,
+      words: [
+        { text: 'A', startOffset: 0, endOffset: 1 },
+        { text: 'quick', startOffset: 2, endOffset: 7 },
+        { text: 'test', startOffset: 8, endOffset: 12 },
+      ],
+    },
   ];
-  
+
   const stats = computeStats(sentences);
   expect(stats.wordCount).toBe(3);
   expect(stats.sentenceCount).toBe(1);

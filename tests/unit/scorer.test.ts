@@ -10,13 +10,13 @@ test('scorer - top 5 hard sentences', () => {
   Here is a simple one.
   This sentence also features considerable complexity, multiple clauses, and extensive vocabulary.
   `;
-  
+
   const sentences = segmentSentences(text);
   const hardSentences = scoreSentences(sentences);
-  
+
   expect(hardSentences.length).toBeGreaterThan(0);
   expect(hardSentences.length).toBeLessThanOrEqual(5);
-  
+
   // The longest sentence should be rank 1
   expect(hardSentences[0].text).toContain('However, this sentence is remarkably convoluted');
   expect(hardSentences[0].rank).toBe(1);

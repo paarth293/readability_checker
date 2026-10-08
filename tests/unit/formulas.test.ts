@@ -14,7 +14,7 @@ test('formulas - computations', () => {
     avgSyllablesPerWord: 1.5,
     readingTimeMinutes: 1,
   };
-  
+
   const formulas = computeFormulas(stats);
   expect(formulas.fleschReadingEase).toBeGreaterThan(0);
   expect(formulas.fleschKincaidGrade).toBeGreaterThan(0);
@@ -23,7 +23,7 @@ test('formulas - computations', () => {
 test('interpretation - correct bands', () => {
   const result = interpretFleschReadingEase(95);
   expect(result.label).toBe('Very Easy');
-  
+
   const result2 = interpretFleschReadingEase(65);
   expect(result2.label).toBe('Standard');
 });

@@ -13,7 +13,7 @@ export interface AnalysisResult {
 
 export function analyzeText(text: string): AnalysisResult {
   const warnings: string[] = [];
-  
+
   if (!text || text.trim().length === 0) {
     warnings.push('Text is empty.');
     return createEmptyResult();
@@ -21,7 +21,7 @@ export function analyzeText(text: string): AnalysisResult {
 
   const normalized = normalizeText(text);
   const sentences = segmentSentences(normalized);
-  
+
   if (sentences.length === 0) {
     warnings.push('No valid sentences found.');
     return createEmptyResult();
@@ -51,9 +51,20 @@ function createEmptyResult(): AnalysisResult {
   return {
     headlineScore: { score: 0, label: 'N/A', interpretation: 'No text provided.' },
     metrics: {
-      wordCount: 0, sentenceCount: 0, syllableCount: 0, characterCount: 0, complexWordCount: 0,
-      avgWordsPerSentence: 0, avgSyllablesPerWord: 0, readingTimeMinutes: 0,
-      fleschReadingEase: 0, fleschKincaidGrade: 0, gunningFog: 0, smog: 0, colemanLiau: 0, ari: 0
+      wordCount: 0,
+      sentenceCount: 0,
+      syllableCount: 0,
+      characterCount: 0,
+      complexWordCount: 0,
+      avgWordsPerSentence: 0,
+      avgSyllablesPerWord: 0,
+      readingTimeMinutes: 0,
+      fleschReadingEase: 0,
+      fleschKincaidGrade: 0,
+      gunningFog: 0,
+      smog: 0,
+      colemanLiau: 0,
+      ari: 0,
     },
     hardestSentences: [],
     warnings: [],
