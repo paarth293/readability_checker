@@ -12,7 +12,8 @@ export default defineConfig({
         functions: 95,
         statements: 95,
       },
-      exclude: ['src/ui/**', 'tests/**'], // Core and worker logic
+      exclude: ['src/ui/**', 'tests/e2e/**'], // Core and worker logic
     },
+    exclude: ['tests/e2e/**', 'node_modules/**'],
   },
 });

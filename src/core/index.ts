@@ -16,7 +16,7 @@ export function analyzeText(text: string): AnalysisResult {
 
   if (!text || text.trim().length === 0) {
     warnings.push('Text is empty.');
-    return createEmptyResult();
+    return createEmptyResult(warnings);
   }
 
   const normalized = normalizeText(text);
@@ -24,7 +24,7 @@ export function analyzeText(text: string): AnalysisResult {
 
   if (sentences.length === 0) {
     warnings.push('No valid sentences found.');
-    return createEmptyResult();
+    return createEmptyResult(warnings);
   }
 
   const stats = computeStats(sentences);
@@ -47,7 +47,7 @@ export function analyzeText(text: string): AnalysisResult {
   };
 }
 
-function createEmptyResult(): AnalysisResult {
+function createEmptyResult(warnings: string[]): AnalysisResult {
   return {
     headlineScore: { score: 0, label: 'N/A', interpretation: 'No text provided.' },
     metrics: {
@@ -67,6 +67,6 @@ function createEmptyResult(): AnalysisResult {
       ari: 0,
     },
     hardestSentences: [],
-    warnings: [],
+    warnings,
   };
 }
