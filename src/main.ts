@@ -1,3 +1,7 @@
 import './style.css';
+import { setupApp } from './ui/app';
 
-console.log('App loaded!');
+const appElement = document.getElementById('app');
+if (appElement) {
+  setupApp(appElement);
+}
