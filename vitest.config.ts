@@ -19,6 +19,7 @@ export default defineConfig({
         'src/main.ts',
         '*.config.ts',
         'eslint.config.js',
+        'dist/**',
       ], // Core logic only
     },
     exclude: ['tests/e2e/**', 'node_modules/**'],
